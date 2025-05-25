@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Υπόλοιπο για τη σύνταξη του Πασχάλη</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background: linear-gradient(to right, #ffffff, #a7d9ff);
+        }
+
+        /* Στυλ για το λογότυπο */
+        .logo-container {
+            width: 100%;
+            display: flex;
+            justify-content: center; /* Κεντράρισμα οριζόντια */
+            align-items: center; /* Κεντράρισμα κάθετα */
+            margin-bottom: 20px; /* Απόσταση από το υπόλοιπο περιεχόμενο */
+        }
+
+        .logo {
+            max-width: 150px; /* Μέγιστο πλάτος */
+            height: auto; /* Διατηρεί τις αναλογίες */
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 40px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
+            color: #2196F3;
+            text-align: center; /* Κεντράρισμα του τίτλου */
+        }
+
+        #countdown {
+            font-size: 5em;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 15px;
+            line-height: 1;
+        }
+
+        .value-container {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .value {
+            font-size: 1em;
+        }
+
+        .label {
+            font-size: 0.3em;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        #milliseconds {
+            font-size: 0.5em;
+            margin-left: 5px;
+            font-weight: normal;
+            color: #444;
+        }
+
+        @media (max-width: 1024px) {
+            h1 {
+                font-size: 2.5em;
+                margin-bottom: 30px;
+            }
+            #countdown {
+                font-size: 3.5em;
+            }
+            .time-unit {
+                margin: 0 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+            #countdown {
+                font-size: 2.5em;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .time-unit {
+                margin: 5px 8px;
+            }
+            .label {
+                font-size: 0.25em;
+            }
+            #milliseconds {
+                font-size: 0.4em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+                text-align: center;
+                padding: 0 10px;
+            }
+            #countdown {
+                font-size: 1.8em;
+                flex-direction: column;
+                align-items: center;
+            }
+            .time-unit {
+                margin: 5px 0;
+            }
+            .label {
+                font-size: 0.2em;
+            }
+            #milliseconds {
+                font-size: 0.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="https://upload.wikimedia.org/wikipedia/el/thumb/a/ac/Greek_police_logo.svg/langel-320px-Greek_police_logo.svg.png" alt="Λογότυπο Ελληνικής Αστυνομίας" class="logo">
+    </div>
+
+    <h1>Υπόλοιπο για τη σύνταξη του Πασχάλη</h1>
+
+    <div id="countdown">
+        <div class="time-unit">
+            <div class="value-container">
+                <span class="value" id="days"></span>
+            </div>
+            <span class="label">ΗΜΕΡΕΣ</span>
+        </div>
+        <div class="time-unit">
+            <div class="value-container">
+                <span class="value" id="hours"></span>
+            </div>
+            <span class="label">ΩΡΕΣ</span>
+        </div>
+        <div class="time-unit">
+            <div class="value-container">
+                <span class="value" id="minutes"></span>
+            </div>
+            <span class="label">ΛΕΠΤΑ</span>
+        </div>
+        <div class="time-unit">
+            <div class="value-container">
+                <span class="value" id="seconds"></span>
+                <span id="milliseconds"></span>
+            </div>
+            <span class="label">ΔΕΥΤΕΡΟΛΕΠΤΑ</span>
+        </div>
+    </div>
+
+    <script>
+        const targetDate = new Date('September 27, 2027 00:00:00').getTime();
+
+        const updateCountdown = () => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            const milliseconds = Math.floor((distance % 1000) / 10);
+
+            document.getElementById('days').innerText = days;
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0') + ".";
+            document.getElementById('milliseconds').innerText = String(milliseconds).padStart(2, '0');
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('countdown').innerHTML = "<div style='font-size: 0.7em; text-align: center; color: #2196F3;'>ΣΥΓΧΑΡΗΤΗΡΙΑ! Η ΣΥΝΤΑΞΗ ΕΦΤΑΣΕ!</div>";
+                document.getElementById('countdown').style.flexDirection = 'row';
+            }
+        };
+
+        const countdownInterval = setInterval(updateCountdown, 10);
+        updateCountdown();
+    </script>
+
+</body>
+</html>
