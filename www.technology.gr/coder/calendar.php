@@ -7,6 +7,7 @@ $month = isset($_GET['month']) ? intval($_GET['month']) : date('n');
 $year  = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 $firstDay = mktime(0,0,0,$month,1,$year);
 $daysInMonth = date('t',$firstDay);
+$months_gr = ['', 'Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος','Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
 
 $stmt = $pdo->prepare('SELECT id,movement_date,license FROM car_jobs WHERE MONTH(movement_date)=? AND YEAR(movement_date)=?');
 $stmt->execute([$month,$year]);
@@ -25,17 +26,27 @@ $nextMonth = $month+1;$nextYear=$year;if($nextMonth>12){$nextMonth=1;$nextYear++
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ημερολόγιο</title>
 <style>
-body{font-family:Arial,sans-serif;margin:0;padding:1em;}
+body{font-family:Arial,sans-serif;margin:0;padding:0;}
+header{padding:1em;background:#333;color:#fff;text-align:center;}
+footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
 table{border-collapse:collapse;width:100%;}
-th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;}
+th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;width:14.28%;}
 th{background:#f0f0f0;}
 @media(max-width:600px){th,td{height:auto;font-size:12px;}}
 nav a{margin-right:10px;}
 </style>
 </head>
 <body>
-<nav><a href="index.php">Αρχική</a></nav>
-<h2 style="text-align:center;"><?= sprintf('%02d/%04d',$month,$year) ?></h2>
+<header>
+    <h1>Εργασίες Οχημάτων</h1>
+    <nav>
+        <a href="index.php" style="color:#fff;margin-right:10px;">Αρχική</a>
+        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώρηση</a>
+        <a href="calendar.php" style="color:#fff;margin-right:10px;">Ημερολόγιο</a>
+        <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
+    </nav>
+</header>
+<h2 style="text-align:center;"><?= mb_strtoupper($months_gr[$month], 'UTF-8').' '. $year ?></h2>
 <div style="text-align:center;margin-bottom:1em;">
 <a href="?month=<?=$prevMonth?>&year=<?=$prevYear?>">&laquo;</a>
 <a href="?month=<?=$nextMonth?>&year=<?=$nextYear?>">&raquo;</a>
@@ -59,5 +70,6 @@ for(;$i<=7;$i++)echo '<td></td>';
 ?>
 </tr>
 </table>
+<footer>ver 1.0  (c) 2025</footer>
 </body>
 </html>

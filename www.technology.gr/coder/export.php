@@ -12,7 +12,7 @@ function fmt_date($d){
 }
 
 // optional filters
-$sql = 'SELECT movement_date, license, kilometers, employee, workplace, work_type, description, id FROM car_jobs WHERE 1';
+$sql = 'SELECT movement_date, license, kilometers, employee, workplace, work_type, description, next_service_date, next_service_km, user_notes, battery, tires, id FROM car_jobs WHERE 1';
 $params = [];
 if(isset($_GET['f_date']) && $_GET['f_date']){ $sql .= ' AND movement_date=?'; $params[] = $_GET['f_date']; }
 if(isset($_GET['f_license']) && $_GET['f_license']){ $sql .= ' AND license=?'; $params[] = $_GET['f_license']; }
@@ -29,7 +29,7 @@ if($type === 'excel'){
     echo "\xEF\xBB\xBF"; // UTF-8 BOM
     echo "<html><head><meta charset=\"UTF-8\"><style>table{border-collapse:collapse;}td,th{border:1px solid #000;padding:4px;font-family:Arial,Helvetica,sans-serif;}</style></head><body>";
     echo "<table>";
-    echo "<tr><th>Ημερομηνία</th><th>Πινακίδα</th><th>Χιλιόμετρα</th><th>Υπάλληλος</th><th>Τόπος</th><th>Είδος</th><th>Περιγραφή</th></tr>";
+    echo "<tr><th>Ημερομηνία</th><th>Πινακίδα</th><th>Χιλιόμετρα</th><th>Υπάλληλος</th><th>Τόπος</th><th>Είδος</th><th>Περιγραφή</th><th>Επόμ. Serv Ημ.</th><th>Επόμ. Serv Χλμ</th><th>Σημειώσεις</th><th>Μπαταρία</th><th>Ελαστικά</th></tr>";
     foreach($records as $r){
         echo '<tr>';
         echo '<td>'.fmt_date($r['movement_date']).'</td>';
@@ -39,6 +39,11 @@ if($type === 'excel'){
         echo '<td>'.htmlspecialchars($r['workplace']).'</td>';
         echo '<td>'.htmlspecialchars($r['work_type']).'</td>';
         echo '<td>'.nl2br(htmlspecialchars($r['description'])).'</td>';
+        echo '<td>'.($r['next_service_date']?fmt_date($r['next_service_date']):'').'</td>';
+        echo '<td>'.($r['next_service_km']?number_format($r['next_service_km'],0,',','.'):'' ).'</td>';
+        echo '<td>'.nl2br(htmlspecialchars($r['user_notes'])).'</td>';
+        echo '<td>'.htmlspecialchars($r['battery']).'</td>';
+        echo '<td>'.htmlspecialchars($r['tires']).'</td>';
         echo '</tr>';
     }
     echo "</table></body></html>";
@@ -49,7 +54,7 @@ $width = 842; // landscape A4
 $height = 595;
 $margin = 20;
 $rowHeight = 20;
-$columns = ['Ημερομηνία','Πινακίδα','Χιλιόμετρα','Υπάλληλος','Τόπος','Είδος','Περιγραφή'];
+$columns = ['Ημερομηνία','Πινακίδα','Χιλιόμετρα','Υπάλληλος','Τόπος','Είδος','Περιγραφή','Επόμ. Serv Ημ.','Επόμ. Serv Χλμ','Σημειώσεις','Μπαταρία','Ελαστικά'];
 $colCount = count($columns);
 $usableWidth = $width - $margin*2;
 $colWidth = $usableWidth / $colCount;
@@ -68,7 +73,12 @@ foreach($records as $r){
         $r['employee'],
         $r['workplace'],
         $r['work_type'],
-        str_replace(["\n","\r"], ' ', $r['description'])
+        str_replace(["\n","\r"], ' ', $r['description']),
+        $r['next_service_date']?fmt_date($r['next_service_date']):'',
+        $r['next_service_km']?number_format($r['next_service_km'],0,',','.'):'',
+        str_replace(["\n","\r"], ' ', $r['user_notes']),
+        $r['battery'],
+        $r['tires']
     ];
 }
 

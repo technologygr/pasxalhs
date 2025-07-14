@@ -9,7 +9,12 @@ $sql = "CREATE TABLE IF NOT EXISTS car_jobs (
     employee VARCHAR(100) NOT NULL,
     workplace VARCHAR(50) NOT NULL,
     work_type VARCHAR(100) NOT NULL,
-    description TEXT
+    description TEXT,
+    next_service_date DATE DEFAULT NULL,
+    next_service_km INT DEFAULT NULL,
+    user_notes TEXT,
+    battery VARCHAR(3) NOT NULL DEFAULT 'ΟΧΙ',
+    tires VARCHAR(3) NOT NULL DEFAULT 'ΟΧΙ'
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 $pdo->exec($sql);
 

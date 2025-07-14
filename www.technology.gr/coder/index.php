@@ -86,9 +86,11 @@ $records = $stmt->fetchAll();
 <style>
     body{font-family:Arial,sans-serif;margin:0;padding:0;}
     header{padding:1em;background:#333;color:#fff;text-align:center;}
+    footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
     .container{padding:1em;}
     table{border-collapse:collapse;width:100%;}
     th,td{border:1px solid #ccc;padding:8px;text-align:left;}
+    tbody tr:nth-child(even){background:#e8f4ff;}
     @media(max-width:600px){
         table,thead,tbody,tr,th,td{display:block;}
         tr{margin-bottom:1em;}
@@ -109,6 +111,7 @@ $records = $stmt->fetchAll();
 </nav>
 </header>
 <div class="container">
+<?php if(isset($_SESSION['warning'])){echo '<p style="color:red">'.$_SESSION['warning'].'</p>';unset($_SESSION['warning']);} ?>
 <p><a href="record.php">Νέα Καταχώρηση</a></p>
 <div style="overflow-x:auto;">
 <form method="get">
@@ -121,6 +124,11 @@ $records = $stmt->fetchAll();
     <th>Τόπος<br>🔍</th>
     <th>Είδος<br>🔍</th>
     <th>Περιγραφή</th>
+    <th>Επόμ. Serv Ημ.</th>
+    <th>Επόμ. Serv Χλμ</th>
+    <th>Σημειώσεις</th>
+    <th>Μπαταρία</th>
+    <th>Ελαστικά</th>
     <th>Ενέργειες</th>
 </tr>
 <tr>
@@ -152,6 +160,11 @@ $records = $stmt->fetchAll();
         </select>
     </td>
     <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
     <td><button type="submit">OK</button> <a href="index.php">Reset</a></td>
 </tr>
 <?php foreach ($records as $row): ?>
@@ -163,6 +176,11 @@ $records = $stmt->fetchAll();
     <td data-label="Τόπος"><?= htmlspecialchars($row['workplace']) ?></td>
     <td data-label="Είδος"><?= htmlspecialchars($row['work_type']) ?></td>
     <td data-label="Περιγραφή"><?= nl2br(htmlspecialchars($row['description'])) ?></td>
+    <td data-label="Επόμ. Serv Ημ."><?= $row['next_service_date']?fmt_date($row['next_service_date']):'' ?></td>
+    <td data-label="Επόμ. Serv Χλμ"><?= $row['next_service_km']?number_format($row['next_service_km'],0,',','.'):'' ?></td>
+    <td data-label="Σημειώσεις"><?= nl2br(htmlspecialchars($row['user_notes'])) ?></td>
+    <td data-label="Μπαταρία"><?= htmlspecialchars($row['battery']) ?></td>
+    <td data-label="Ελαστικά"><?= htmlspecialchars($row['tires']) ?></td>
     <td>
         <a href="record.php?id=<?= $row['id'] ?>" title="Επεξεργασία" style="text-decoration:none;">✏️</a>
         |
@@ -175,5 +193,6 @@ $records = $stmt->fetchAll();
 </div>
 <p style="margin-top:1em;"><a href="export.php?type=excel">Export Excel</a> | <a href="export.php?type=pdf">Export PDF</a></p>
 </div>
+<footer>ver 1.0  (c) 2025</footer>
 </body>
 </html>

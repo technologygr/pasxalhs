@@ -53,8 +53,10 @@ $items = $pdo->query("SELECT * FROM $table ORDER BY name")->fetchAll();
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= $title ?></title>
 <style>
-    body{font-family:Arial,sans-serif;margin:0;padding:1em;background:#f4f4f4;}
-    h1{text-align:center;}
+    body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;}
+    header{padding:1em;background:#333;color:#fff;text-align:center;}
+    footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
+    h1{text-align:center;margin:0;padding:1em 0;}
     table{border-collapse:collapse;width:100%;margin-bottom:1em;}
     th,td{border:1px solid #ccc;padding:6px;text-align:left;}
     form{max-width:400px;margin:0 auto;background:#fff;padding:1em;border-radius:5px;}
@@ -66,6 +68,15 @@ $items = $pdo->query("SELECT * FROM $table ORDER BY name")->fetchAll();
 </style>
 </head>
 <body>
+<header>
+    <h1>Εργασίες Οχημάτων</h1>
+    <nav>
+        <a href="index.php" style="color:#fff;margin-right:10px;">Αρχική</a>
+        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώρηση</a>
+        <a href="calendar.php" style="color:#fff;margin-right:10px;">Ημερολόγιο</a>
+        <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
+    </nav>
+</header>
 <h1><?= $title ?></h1>
 <table>
 <tr><th>Όνομα</th><th>Ενέργειες</th></tr>
@@ -88,5 +99,6 @@ $items = $pdo->query("SELECT * FROM $table ORDER BY name")->fetchAll();
     <button type="submit">Αποθήκευση</button>
     <a href="helpers.php">Πίσω</a>
 </form>
+<footer>ver 1.0  (c) 2025</footer>
 </body>
 </html>
