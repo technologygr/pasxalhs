@@ -7,7 +7,20 @@ if(!isset($_SESSION['logged_in'])){
 }
 $type = isset($_GET['type']) ? $_GET['type'] : 'excel';
 
-$stmt = $pdo->query('SELECT movement_date, license, kilometers, employee, workplace, work_type, description FROM car_jobs ORDER BY movement_date DESC, id DESC');
+function fmt_date($d){
+    return date('d-m-Y', strtotime($d));
+}
+
+// optional filters
+$sql = 'SELECT movement_date, license, kilometers, employee, workplace, work_type, description, id FROM car_jobs WHERE 1';
+$params = [];
+if(isset($_GET['f_date']) && $_GET['f_date']){ $sql .= ' AND movement_date=?'; $params[] = $_GET['f_date']; }
+if(isset($_GET['f_license']) && $_GET['f_license']){ $sql .= ' AND license=?'; $params[] = $_GET['f_license']; }
+if(isset($_GET['f_workplace']) && $_GET['f_workplace']){ $sql .= ' AND workplace=?'; $params[] = $_GET['f_workplace']; }
+if(isset($_GET['f_work_type']) && $_GET['f_work_type']){ $sql .= ' AND work_type=?'; $params[] = $_GET['f_work_type']; }
+$sql .= ' ORDER BY movement_date DESC, id DESC';
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $records = $stmt->fetchAll();
 
 if($type === 'excel'){
@@ -19,9 +32,9 @@ if($type === 'excel'){
     echo "<tr><th>Ημερομηνία</th><th>Πινακίδα</th><th>Χιλιόμετρα</th><th>Υπάλληλος</th><th>Τόπος</th><th>Είδος</th><th>Περιγραφή</th></tr>";
     foreach($records as $r){
         echo '<tr>';
-        echo '<td>'.htmlspecialchars($r['movement_date']).'</td>';
+        echo '<td>'.fmt_date($r['movement_date']).'</td>';
         echo '<td>'.htmlspecialchars($r['license']).'</td>';
-        echo '<td>'.htmlspecialchars($r['kilometers']).'</td>';
+        echo '<td>'.number_format($r['kilometers'],0,',','.') .'</td>';
         echo '<td>'.htmlspecialchars($r['employee']).'</td>';
         echo '<td>'.htmlspecialchars($r['workplace']).'</td>';
         echo '<td>'.htmlspecialchars($r['work_type']).'</td>';
@@ -49,9 +62,9 @@ $rows = [];
 $rows[] = $columns;
 foreach($records as $r){
     $rows[] = [
-        $r['movement_date'],
+        fmt_date($r['movement_date']),
         $r['license'],
-        $r['kilometers'],
+        number_format($r['kilometers'],0,',','.'),
         $r['employee'],
         $r['workplace'],
         $r['work_type'],
