@@ -38,6 +38,7 @@ footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
 table{border-collapse:collapse;width:100%;}
 th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;width:14.28%;}
 td strong{font-size:28px;color:#000;}
+.entries{font-size:12px;line-height:1.2;}
 td a{color:#000;text-decoration:none;}
 th{background:#f0f0f0;}
 @media(max-width:600px){th,td{height:auto;font-size:12px;}}
@@ -68,7 +69,7 @@ $d=1;$i=$dayOfWeek;
 while($d<=$daysInMonth){
     if($i==8){echo '</tr><tr>';$i=1;}
     $linkDate = sprintf('%04d-%02d-%02d',$year,$month,$d);
-    echo '<td><a href="record.php?service_date='.$linkDate.'"><strong>'.$d.'</strong></a><br>';
+    echo '<td><a href="record.php?service_date='.$linkDate.'"><strong>'.$d.'</strong></a><br><div class="entries">';
     if(isset($records[$d])){
         foreach($records[$d] as $rec){
             $lic = htmlspecialchars($rec['license']);
@@ -83,7 +84,7 @@ while($d<=$daysInMonth){
             echo '<span style="color:green;font-weight:bold;">'.$disp.'</span><br>';
         }
     }
-    echo '</td>';
+    echo '</div></td>';
     $d++;$i++;}
 for(;$i<=7;$i++)echo '<td></td>';
 ?>
