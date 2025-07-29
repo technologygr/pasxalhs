@@ -10,7 +10,7 @@ if (!isset($_SESSION['logged_in'])) {
 $licenses = $pdo->query("SELECT name FROM licenses ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 $workplaces = $pdo->query("SELECT name FROM workplaces ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 $employees = $pdo->query("SELECT name FROM employees ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
-$work_types = ["Εκτακτη βλάβη","Προγραμματισμένο Service","Προγραμματισμένος έλεγχος","Αλλο γεγονός"];
+$work_types = $pdo->query("SELECT name FROM work_types ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -104,6 +104,7 @@ if ($id) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title><?= $id ? 'Επεξεργασία' : 'Νέα' ?> Εργασία Οχήματος</title>
 <style>
     body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;}

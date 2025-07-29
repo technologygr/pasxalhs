@@ -10,6 +10,7 @@ if (!isset($_SESSION['logged_in'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>Βοηθητικά</title>
 <style>
     body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;}
@@ -37,6 +38,7 @@ if (!isset($_SESSION['logged_in'])) {
     <li><a href="manage.php?entity=licenses">Πινακίδες Οχημάτων</a></li>
     <li><a href="manage.php?entity=employees">Υπάλληλοι</a></li>
     <li><a href="manage.php?entity=workplaces">Τόποι Εργασίας</a></li>
+    <li><a href="manage.php?entity=work_types">Είδη Εργασίας</a></li>
 </ul>
 <p style="text-align:center;"><a href="index.php" style="background:#ccc;color:#000;">Επιστροφή</a></p>
 <footer>ver 1.0  (c) 2025</footer>

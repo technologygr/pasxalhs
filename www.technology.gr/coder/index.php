@@ -19,6 +19,7 @@ if (!isset($_SESSION['logged_in'])) {
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
     <title>Είσοδος</title>
     <style>
         body{font-family:Arial,sans-serif;padding:1em;background:#f4f4f4;}
@@ -60,14 +61,15 @@ function display_text($text){
     $safe = nl2br(htmlspecialchars($text));
     if(mb_strlen($text)<=350) return $safe;
     $short = nl2br(htmlspecialchars(mb_substr($text,0,350)));
-    $icon  = '<span class="expand" style="cursor:pointer;color:blue;">&#x2795;</span>';
-    return $short.' '.$icon.'<span class="full-text" style="display:none;">'.$safe.'</span>';
+    $expand = '<span class="expand" style="cursor:pointer;color:blue;">&#x2795;</span>';
+    $collapse = '<span class="collapse" style="cursor:pointer;color:blue;">&#x2796;</span>';
+    return $short.' '.$expand.'<span class="full-text" style="display:none;">'.$safe.' '.$collapse.'</span>';
 }
 
 // fetch dropdown lists for filters
 $licenses = $pdo->query("SELECT name FROM licenses ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 $workplaces = $pdo->query("SELECT name FROM workplaces ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
-$work_types = ["Εκτακτη βλάβη","Προγραμματισμένο Service","Προγραμματισμένος έλεγχος","Αλλο γεγονός"];
+$work_types = $pdo->query("SELECT name FROM work_types ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 
 // Build filtering query
 $where = [];
@@ -105,6 +107,7 @@ $records = $stmt->fetchAll();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>Καταχώρηση Εργασιών Οχημάτων</title>
 <style>
     body{font-family:Arial,sans-serif;margin:0;padding:0;}
@@ -257,6 +260,9 @@ document.addEventListener('click',function(e){
   if(e.target.classList.contains('expand')){
      e.target.style.display='none';
      var full=e.target.nextElementSibling; if(full) full.style.display='inline';
+  }else if(e.target.classList.contains('collapse')){
+     var full=e.target.parentElement; if(full) full.style.display='none';
+     var expand=full.previousElementSibling; if(expand) expand.style.display='inline';
   }
 });
 </script>

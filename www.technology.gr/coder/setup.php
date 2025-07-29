@@ -79,5 +79,21 @@ if (!$pdo->query('SELECT COUNT(*) FROM workplaces')->fetchColumn()) {
     echo "Ο πίνακας workplaces έχει ήδη δεδομένα.<br>\n";
 }
 
+$pdo->exec("CREATE TABLE IF NOT EXISTS work_types (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+echo "Έλεγχος πίνακα work_types...<br>\n";
+if (!$pdo->query('SELECT COUNT(*) FROM work_types')->fetchColumn()) {
+    $pdo->exec("INSERT INTO work_types (name) VALUES
+        ('Εκτακτη βλάβη'),
+        ('Προγραμματισμένο Service'),
+        ('Προγραμματισμένος έλεγχος'),
+        ('Αλλο γεγονός')");
+    echo "Προστέθηκαν default work types.<br>\n";
+} else {
+    echo "Ο πίνακας work_types έχει ήδη δεδομένα.<br>\n";
+}
+
 echo "Setup complete.<br>\n";
 ?>

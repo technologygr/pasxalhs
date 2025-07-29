@@ -28,6 +28,7 @@ $nextMonth = $month+1;$nextYear=$year;if($nextMonth>12){$nextMonth=1;$nextYear++
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>Ημερολόγιο</title>
 <style>
 body{font-family:Arial,sans-serif;margin:0;padding:0;display:flex;min-height:100vh;flex-direction:column;}
@@ -36,7 +37,8 @@ header{padding:1em;background:#333;color:#fff;text-align:center;}
 footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
 table{border-collapse:collapse;width:100%;}
 th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;width:14.28%;}
-td strong{font-size:14px;}
+td strong{font-size:28px;color:#000;}
+td a{color:#000;text-decoration:none;}
 th{background:#f0f0f0;}
 @media(max-width:600px){th,td{height:auto;font-size:12px;}}
 nav a{margin-right:10px;}

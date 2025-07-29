@@ -9,7 +9,8 @@ $entity = isset($_GET['entity']) ? $_GET['entity'] : '';
 $names = [
     'licenses' => 'Πινακίδες',
     'employees' => 'Υπάλληλοι',
-    'workplaces' => 'Τόποι Εργασίας'
+    'workplaces' => 'Τόποι Εργασίας',
+    'work_types' => 'Είδη Εργασίας'
 ];
 if (!isset($names[$entity])) {
     exit('Invalid entity');
@@ -51,6 +52,7 @@ $items = $pdo->query("SELECT * FROM $table ORDER BY name")->fetchAll();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title><?= $title ?></title>
 <style>
     body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;}
