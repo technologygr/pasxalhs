@@ -64,6 +64,7 @@ $items = $pdo->query("SELECT * FROM $table ORDER BY name")->fetchAll();
     input{width:100%;padding:.5em;margin-top:.2em;box-sizing:border-box;}
     button,a{padding:.5px 1em;margin-top:.5em;display:inline-block;}
     a{background:#ccc;color:#000;text-decoration:none;border-radius:4px;}
+    header nav a{display:inline-block;margin-right:10px;color:#fff;text-decoration:none;background:none;padding:0;}
     button{background:#007bff;color:#fff;border:none;border-radius:4px;}
 </style>
 </head>

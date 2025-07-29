@@ -56,13 +56,20 @@ function fmt_date($d){
     return date('d-m-Y', strtotime($d));
 }
 
+function display_text($text){
+    $safe = nl2br(htmlspecialchars($text));
+    if(mb_strlen($text)<=350) return $safe;
+    $short = nl2br(htmlspecialchars(mb_substr($text,0,350))).'...';
+    return '<span class="short-text" style="cursor:pointer;color:blue;">'.$short.'</span><span class="full-text" style="display:none;">'.$safe.'</span>';
+}
+
 // fetch dropdown lists for filters
 $licenses = $pdo->query("SELECT name FROM licenses ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 $workplaces = $pdo->query("SELECT name FROM workplaces ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 $work_types = ["Εκτακτη βλάβη","Προγραμματισμένο Service","Προγραμματισμένος έλεγχος","Αλλο γεγονός"];
 
 // Build filtering query
-$sql = 'SELECT * FROM car_jobs WHERE 1';
+$where = [];
 $params = [];
 $filter_date = $_GET['f_date'] ?? '';
 $filter_license = $_GET['f_license'] ?? '';
@@ -70,15 +77,26 @@ $filter_workplace = $_GET['f_workplace'] ?? '';
 $filter_work_type = $_GET['f_work_type'] ?? '';
 $filter_battery = $_GET['f_battery'] ?? '';
 $filter_tires = $_GET['f_tires'] ?? '';
-if($filter_date){ $sql .= ' AND movement_date = ?'; $params[] = $filter_date; }
-if($filter_license){ $sql .= ' AND license = ?'; $params[] = $filter_license; }
-if($filter_workplace){ $sql .= ' AND workplace = ?'; $params[] = $filter_workplace; }
-if($filter_work_type){ $sql .= ' AND work_type = ?'; $params[] = $filter_work_type; }
-if($filter_battery){ $sql .= ' AND battery = ?'; $params[] = $filter_battery; }
-if($filter_tires){ $sql .= ' AND tires = ?'; $params[] = $filter_tires; }
-$sql .= ' ORDER BY movement_date DESC, id DESC';
+if($filter_date){ $where[] = 'movement_date = ?'; $params[] = $filter_date; }
+if($filter_license){ $where[] = 'license = ?'; $params[] = $filter_license; }
+if($filter_workplace){ $where[] = 'workplace = ?'; $params[] = $filter_workplace; }
+if($filter_work_type){ $where[] = 'work_type = ?'; $params[] = $filter_work_type; }
+if($filter_battery){ $where[] = 'battery = ?'; $params[] = $filter_battery; }
+if($filter_tires){ $where[] = 'tires = ?'; $params[] = $filter_tires; }
+$whereSql = $where ? (' WHERE '.implode(' AND ', $where)) : '';
+
+$page = max(1, intval($_GET['page'] ?? 1));
+$perPage = 10;
+$offset = ($page-1)*$perPage;
+
+$countStmt = $pdo->prepare('SELECT COUNT(*) FROM car_jobs'.$whereSql);
+$countStmt->execute($params);
+$totalRecords = $countStmt->fetchColumn();
+
+$sql = 'SELECT * FROM car_jobs'.$whereSql.' ORDER BY movement_date DESC, id DESC LIMIT ? OFFSET ?';
 $stmt = $pdo->prepare($sql);
-$stmt->execute($params);
+$dataParams = array_merge($params, [$perPage, $offset]);
+$stmt->execute($dataParams);
 $records = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -98,8 +116,8 @@ $records = $stmt->fetchAll();
     @media(max-width:600px){
         table,thead,tbody,tr,th,td{display:block;}
         tr{margin-bottom:1em;}
-        th{background:#f0f0f0;}
-        th,td{border:none;padding:4px;}
+        thead tr:first-child{display:none;}
+        th,td{border:none;padding:4px;text-align:left !important;}
         td:before{content:attr(data-label);font-weight:bold;display:block;}
     }
 </style>
@@ -120,6 +138,7 @@ $records = $stmt->fetchAll();
 <div style="overflow-x:auto;">
 <form method="get">
 <table>
+<thead>
 <tr>
     <th>Ημερομηνία<br>🔍</th>
     <th>Πινακίδα<br>🔍</th>
@@ -135,7 +154,7 @@ $records = $stmt->fetchAll();
     <th>Ελαστικά<br>🔍</th>
     <th>Ενέργειες</th>
 </tr>
-<tr>
+<tr class="filters">
     <td><input type="date" name="f_date" value="<?= htmlspecialchars($filter_date) ?>" style="width:100%;"></td>
     <td>
         <select name="f_license" style="width:100%;">
@@ -145,20 +164,8 @@ $records = $stmt->fetchAll();
             <?php endforeach; ?>
         </select>
     </td>
-    <td>
-        <select name="f_battery" style="width:100%;">
-            <option value="">--</option>
-            <option value="ΝΑΙ" <?= $filter_battery=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
-            <option value="ΟΧΙ" <?= $filter_battery=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
-        </select>
-    </td>
-    <td>
-        <select name="f_tires" style="width:100%;">
-            <option value="">--</option>
-            <option value="ΝΑΙ" <?= $filter_tires=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
-            <option value="ΟΧΙ" <?= $filter_tires=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
-        </select>
-    </td>
+    <td></td>
+    <td></td>
     <td>
         <select name="f_workplace" style="width:100%;">
             <option value="">--</option>
@@ -179,15 +186,28 @@ $records = $stmt->fetchAll();
     <td></td>
     <td></td>
     <td></td>
-    <td></td>
-    <td></td>
+    <td>
+        <select name="f_battery" style="width:100%;">
+            <option value="">--</option>
+            <option value="ΝΑΙ" <?= $filter_battery=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
+            <option value="ΟΧΙ" <?= $filter_battery=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
+        </select>
+    </td>
+    <td>
+        <select name="f_tires" style="width:100%;">
+            <option value="">--</option>
+            <option value="ΝΑΙ" <?= $filter_tires=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
+            <option value="ΟΧΙ" <?= $filter_tires=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
+        </select>
+    </td>
     <td><button type="submit">OK</button> <a href="index.php">Reset</a></td>
 </tr>
+</thead>
+<tbody>
 <?php foreach ($records as $row): ?>
 <?php
     $license = htmlspecialchars($row['license']);
     $licenseDisp = '<strong>'.mb_substr($license,0,8,'UTF-8').'</strong>'.mb_substr($license,8,null,'UTF-8');
-    $descStyle = mb_strlen($row['description'])>400 ? ' style="font-size:8pt;font-family:\'Arial Narrow\',Arial,sans-serif;"' : '';
 ?>
 <tr>
     <td data-label="Ημερομηνία"><?= fmt_date($row['movement_date']) ?></td>
@@ -198,10 +218,10 @@ $records = $stmt->fetchAll();
     <td data-label="Υπάλληλος"><?= htmlspecialchars($row['employee']) ?></td>
     <td data-label="Τόπος"><?= htmlspecialchars($row['workplace']) ?></td>
     <td data-label="Είδος"><?= htmlspecialchars($row['work_type']) ?></td>
-    <td data-label="Περιγραφή"<?php echo $descStyle; ?>><?= nl2br(htmlspecialchars($row['description'])) ?></td>
+    <td data-label="Περιγραφή"><?= display_text($row['description']) ?></td>
     <td data-label="Επόμ. Serv Ημ."><?= $row['next_service_date']?fmt_date($row['next_service_date']):'' ?></td>
     <td data-label="Επόμ. Serv Χλμ" style="text-align:center;"><?= $row['next_service_km']?number_format($row['next_service_km'],0,',','.'):'' ?></td>
-    <td data-label="Σημειώσεις"><?= nl2br(htmlspecialchars($row['user_notes'])) ?></td>
+    <td data-label="Σημειώσεις"><?= display_text($row['user_notes']) ?></td>
     <td data-label="Μπαταρία" style="text-align:center;"><?= htmlspecialchars($row['battery']) ?></td>
     <td data-label="Ελαστικά" style="text-align:center;"><?= htmlspecialchars($row['tires']) ?></td>
     <td>
@@ -211,11 +231,33 @@ $records = $stmt->fetchAll();
     </td>
 </tr>
 <?php endforeach; ?>
+</tbody>
 </table>
 </form>
+</div>
+<div style="text-align:center;margin-top:0.5em;">
+<?php
+$paramsForLinks = $_GET;
+if($page>1){
+    $paramsForLinks['page']=$page-1;
+    echo '<a href="?'.http_build_query($paramsForLinks).'">&#9664;</a> ';
+}
+if($page*$perPage < $totalRecords){
+    $paramsForLinks['page']=$page+1;
+    echo '<a href="?'.http_build_query($paramsForLinks).'">&#9654;</a>';
+}
+?>
 </div>
 <p style="margin-top:1em;"><a href="export.php?type=excel">Export Excel</a> | <a href="export.php?type=pdf">Export PDF</a></p>
 </div>
 <footer>ver 1.0  (c) 2025</footer>
+<script>
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('short-text')){
+     e.target.style.display='none';
+     var full=e.target.nextElementSibling; if(full) full.style.display='inline';
+  }
+});
+</script>
 </body>
 </html>

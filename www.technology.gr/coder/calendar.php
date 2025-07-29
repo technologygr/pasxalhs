@@ -64,7 +64,8 @@ $dayOfWeek=date('N',$firstDay);echo '<tr>';for($i=1;$i<$dayOfWeek;$i++)echo '<td
 $d=1;$i=$dayOfWeek;
 while($d<=$daysInMonth){
     if($i==8){echo '</tr><tr>';$i=1;}
-    echo '<td><strong>'.$d.'</strong><br>';
+    $linkDate = sprintf('%04d-%02d-%02d',$year,$month,$d);
+    echo '<td><a href="record.php?service_date='.$linkDate.'"><strong>'.$d.'</strong></a><br>';
     if(isset($records[$d])){
         foreach($records[$d] as $rec){
             echo '<a href="record.php?id='.$rec['id'].'">'.htmlspecialchars($rec['license']).'</a><br>';

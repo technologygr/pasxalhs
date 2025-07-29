@@ -83,6 +83,8 @@ if ($id) {
     $stmt = $pdo->prepare('SELECT * FROM car_jobs WHERE id = ?');
     $stmt->execute([$id]);
     $record = $stmt->fetch();
+} elseif(isset($_GET['service_date'])) {
+    $record['next_service_date'] = $_GET['service_date'];
 }
 ?>
 <!DOCTYPE html>
