@@ -9,12 +9,16 @@ $firstDay = mktime(0,0,0,$month,1,$year);
 $daysInMonth = date('t',$firstDay);
 $months_gr = ['', 'Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος','Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
 
-$stmt = $pdo->prepare('SELECT id,movement_date,license FROM car_jobs WHERE MONTH(movement_date)=? AND YEAR(movement_date)=?');
-$stmt->execute([$month,$year]);
-$records = [];
+$stmt = $pdo->prepare('SELECT id,movement_date,next_service_date,license FROM car_jobs WHERE (MONTH(movement_date)=? AND YEAR(movement_date)=?) OR (next_service_date IS NOT NULL AND MONTH(next_service_date)=? AND YEAR(next_service_date)=?)');
+$stmt->execute([$month,$year,$month,$year]);
+$records = $services = [];
 while($r=$stmt->fetch()){
-    $day = (int)date('j',strtotime($r['movement_date']));
-    $records[$day][] = $r;
+    $dayMove = (int)date('j',strtotime($r['movement_date']));
+    $records[$dayMove][] = ['id'=>$r['id'],'license'=>$r['license']];
+    if($r['next_service_date']){
+        $dayServ = (int)date('j',strtotime($r['next_service_date']));
+        $services[$dayServ][] = ['id'=>$r['id'],'license'=>$r['license']];
+    }
 }
 $prevMonth = $month-1;$prevYear=$year;if($prevMonth<1){$prevMonth=12;$prevYear--;}
 $nextMonth = $month+1;$nextYear=$year;if($nextMonth>12){$nextMonth=1;$nextYear++;}
@@ -26,7 +30,8 @@ $nextMonth = $month+1;$nextYear=$year;if($nextMonth>12){$nextMonth=1;$nextYear++
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ημερολόγιο</title>
 <style>
-body{font-family:Arial,sans-serif;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;margin:0;padding:0;display:flex;min-height:100vh;flex-direction:column;}
+main{flex:1;}
 header{padding:1em;background:#333;color:#fff;text-align:center;}
 footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
 table{border-collapse:collapse;width:100%;}
@@ -46,6 +51,7 @@ nav a{margin-right:10px;}
         <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
     </nav>
 </header>
+<main>
 <h2 style="text-align:center;"><?= mb_strtoupper($months_gr[$month], 'UTF-8').' '. $year ?></h2>
 <div style="text-align:center;margin-bottom:1em;">
 <a href="?month=<?=$prevMonth?>&year=<?=$prevYear?>">&laquo;</a>
@@ -64,12 +70,18 @@ while($d<=$daysInMonth){
             echo '<a href="record.php?id='.$rec['id'].'">'.htmlspecialchars($rec['license']).'</a><br>';
         }
     }
+    if(isset($services[$d])){
+        foreach($services[$d] as $rec){
+            echo '<span style="color:green;font-weight:bold;">'.htmlspecialchars($rec['license']).'</span><br>';
+        }
+    }
     echo '</td>';
     $d++;$i++;}
 for(;$i<=7;$i++)echo '<td></td>';
 ?>
 </tr>
 </table>
+</main>
 <footer>ver 1.0  (c) 2025</footer>
 </body>
 </html>

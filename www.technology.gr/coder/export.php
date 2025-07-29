@@ -14,10 +14,20 @@ function fmt_date($d){
 // optional filters
 $sql = 'SELECT movement_date, license, kilometers, employee, workplace, work_type, description, next_service_date, next_service_km, user_notes, battery, tires, id FROM car_jobs WHERE 1';
 $params = [];
-if(isset($_GET['f_date']) && $_GET['f_date']){ $sql .= ' AND movement_date=?'; $params[] = $_GET['f_date']; }
-if(isset($_GET['f_license']) && $_GET['f_license']){ $sql .= ' AND license=?'; $params[] = $_GET['f_license']; }
-if(isset($_GET['f_workplace']) && $_GET['f_workplace']){ $sql .= ' AND workplace=?'; $params[] = $_GET['f_workplace']; }
-if(isset($_GET['f_work_type']) && $_GET['f_work_type']){ $sql .= ' AND work_type=?'; $params[] = $_GET['f_work_type']; }
+$filterKeys = [
+    'f_date' => 'movement_date',
+    'f_license' => 'license',
+    'f_workplace' => 'workplace',
+    'f_work_type' => 'work_type',
+    'f_battery' => 'battery',
+    'f_tires' => 'tires'
+];
+foreach($filterKeys as $param => $col){
+    if(isset($_GET[$param]) && $_GET[$param] !== ''){
+        $sql .= " AND $col=?";
+        $params[] = $_GET[$param];
+    }
+}
 $sql .= ' ORDER BY movement_date DESC, id DESC';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

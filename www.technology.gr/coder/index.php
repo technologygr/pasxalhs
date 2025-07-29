@@ -68,10 +68,14 @@ $filter_date = $_GET['f_date'] ?? '';
 $filter_license = $_GET['f_license'] ?? '';
 $filter_workplace = $_GET['f_workplace'] ?? '';
 $filter_work_type = $_GET['f_work_type'] ?? '';
+$filter_battery = $_GET['f_battery'] ?? '';
+$filter_tires = $_GET['f_tires'] ?? '';
 if($filter_date){ $sql .= ' AND movement_date = ?'; $params[] = $filter_date; }
 if($filter_license){ $sql .= ' AND license = ?'; $params[] = $filter_license; }
 if($filter_workplace){ $sql .= ' AND workplace = ?'; $params[] = $filter_workplace; }
 if($filter_work_type){ $sql .= ' AND work_type = ?'; $params[] = $filter_work_type; }
+if($filter_battery){ $sql .= ' AND battery = ?'; $params[] = $filter_battery; }
+if($filter_tires){ $sql .= ' AND tires = ?'; $params[] = $filter_tires; }
 $sql .= ' ORDER BY movement_date DESC, id DESC';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -127,8 +131,8 @@ $records = $stmt->fetchAll();
     <th>Επόμ. Serv Ημ.</th>
     <th>Επόμ. Serv Χλμ</th>
     <th>Σημειώσεις</th>
-    <th>Μπαταρία</th>
-    <th>Ελαστικά</th>
+    <th>Μπαταρία<br>🔍</th>
+    <th>Ελαστικά<br>🔍</th>
     <th>Ενέργειες</th>
 </tr>
 <tr>
@@ -141,8 +145,20 @@ $records = $stmt->fetchAll();
             <?php endforeach; ?>
         </select>
     </td>
-    <td></td>
-    <td></td>
+    <td>
+        <select name="f_battery" style="width:100%;">
+            <option value="">--</option>
+            <option value="ΝΑΙ" <?= $filter_battery=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
+            <option value="ΟΧΙ" <?= $filter_battery=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
+        </select>
+    </td>
+    <td>
+        <select name="f_tires" style="width:100%;">
+            <option value="">--</option>
+            <option value="ΝΑΙ" <?= $filter_tires=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
+            <option value="ΟΧΙ" <?= $filter_tires=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
+        </select>
+    </td>
     <td>
         <select name="f_workplace" style="width:100%;">
             <option value="">--</option>
@@ -168,19 +184,26 @@ $records = $stmt->fetchAll();
     <td><button type="submit">OK</button> <a href="index.php">Reset</a></td>
 </tr>
 <?php foreach ($records as $row): ?>
+<?php
+    $license = htmlspecialchars($row['license']);
+    $licenseDisp = '<strong>'.mb_substr($license,0,8,'UTF-8').'</strong>'.mb_substr($license,8,null,'UTF-8');
+    $descStyle = mb_strlen($row['description'])>400 ? ' style="font-size:8pt;font-family:\'Arial Narrow\',Arial,sans-serif;"' : '';
+?>
 <tr>
     <td data-label="Ημερομηνία"><?= fmt_date($row['movement_date']) ?></td>
-    <td data-label="Πινακίδα"><?= htmlspecialchars($row['license']) ?></td>
-    <td data-label="Χιλιόμετρα"><?= number_format($row['kilometers'],0,',','.') ?></td>
+    <td data-label="Πινακίδα"><?= $licenseDisp ?></td>
+    <td data-label="Χιλιόμετρα" style="text-align:center;">
+        <?= number_format($row['kilometers'],0,',','.') ?>
+    </td>
     <td data-label="Υπάλληλος"><?= htmlspecialchars($row['employee']) ?></td>
     <td data-label="Τόπος"><?= htmlspecialchars($row['workplace']) ?></td>
     <td data-label="Είδος"><?= htmlspecialchars($row['work_type']) ?></td>
-    <td data-label="Περιγραφή"><?= nl2br(htmlspecialchars($row['description'])) ?></td>
+    <td data-label="Περιγραφή"<?php echo $descStyle; ?>><?= nl2br(htmlspecialchars($row['description'])) ?></td>
     <td data-label="Επόμ. Serv Ημ."><?= $row['next_service_date']?fmt_date($row['next_service_date']):'' ?></td>
-    <td data-label="Επόμ. Serv Χλμ"><?= $row['next_service_km']?number_format($row['next_service_km'],0,',','.'):'' ?></td>
+    <td data-label="Επόμ. Serv Χλμ" style="text-align:center;"><?= $row['next_service_km']?number_format($row['next_service_km'],0,',','.'):'' ?></td>
     <td data-label="Σημειώσεις"><?= nl2br(htmlspecialchars($row['user_notes'])) ?></td>
-    <td data-label="Μπαταρία"><?= htmlspecialchars($row['battery']) ?></td>
-    <td data-label="Ελαστικά"><?= htmlspecialchars($row['tires']) ?></td>
+    <td data-label="Μπαταρία" style="text-align:center;"><?= htmlspecialchars($row['battery']) ?></td>
+    <td data-label="Ελαστικά" style="text-align:center;"><?= htmlspecialchars($row['tires']) ?></td>
     <td>
         <a href="record.php?id=<?= $row['id'] ?>" title="Επεξεργασία" style="text-decoration:none;">✏️</a>
         |

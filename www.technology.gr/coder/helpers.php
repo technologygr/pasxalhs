@@ -18,7 +18,7 @@ if (!isset($_SESSION['logged_in'])) {
     h1{text-align:center;}
     ul{list-style:none;padding:0;max-width:300px;margin:0 auto;}
     li{margin:0.5em 0;}
-    a{display:block;padding:0.5em;background:#007bff;color:#fff;text-decoration:none;border-radius:4px;text-align:center;}
+    a{display:block;padding:0.5em;background:#333;color:#fff;text-decoration:none;border-radius:4px;text-align:center;}
 </style>
 </head>
 <body>
