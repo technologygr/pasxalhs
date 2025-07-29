@@ -31,6 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'tires' => $_POST['tires'] ?? 'ΟΧΙ',
     ];
 
+    $errors = [];
+    $minDate = '2025-01-01';
+    if($data['kilometers'] > 900000) $errors[] = 'Χιλιόμετρα έως 900000.';
+    if($data['next_service_km'] !== null && $data['next_service_km'] > 900000) $errors[] = 'ΧΛΜ επόμενου service έως 900000.';
+    if($data['movement_date'] && $data['movement_date'] <= $minDate) $errors[] = 'Ημερομηνία εγγραφής μετά την 01-01-2025.';
+    if($data['next_service_date'] && $data['next_service_date'] <= $minDate) $errors[] = 'Ημ/νία επόμενου service μετά την 01-01-2025.';
+
     $warnings = [];
     $stmt = $pdo->prepare('SELECT kilometers FROM car_jobs WHERE license=? ORDER BY movement_date DESC, id DESC LIMIT 1');
     $stmt->execute([$data['license']]);
@@ -44,24 +51,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if($data['next_service_km'] !== null && $data['next_service_km'] <= $data['kilometers']){
         $warnings[] = 'Προειδοποίηση: τα χιλιόμετρα επόμενου service είναι μικρότερα.';
     }
-    if ($id) {
-        // update
-        $sql = "UPDATE car_jobs SET movement_date=:movement_date, license=:license, kilometers=:kilometers, employee=:employee, workplace=:workplace, work_type=:work_type, description=:description, next_service_date=:next_service_date, next_service_km=:next_service_km, user_notes=:user_notes, battery=:battery, tires=:tires WHERE id=:id";
-        $stmt = $pdo->prepare($sql);
-        $data['id'] = $id;
-        $stmt->execute($data);
+    if(empty($errors)){
+        if ($id) {
+            // update
+            $sql = "UPDATE car_jobs SET movement_date=:movement_date, license=:license, kilometers=:kilometers, employee=:employee, workplace=:workplace, work_type=:work_type, description=:description, next_service_date=:next_service_date, next_service_km=:next_service_km, user_notes=:user_notes, battery=:battery, tires=:tires WHERE id=:id";
+            $stmt = $pdo->prepare($sql);
+            $data['id'] = $id;
+            $stmt->execute($data);
+        } else {
+            // insert
+            $sql = "INSERT INTO car_jobs (movement_date, license, kilometers, employee, workplace, work_type, description, next_service_date, next_service_km, user_notes, battery, tires) VALUES (:movement_date,:license,:kilometers,:employee,:workplace,:work_type,:description,:next_service_date,:next_service_km,:user_notes,:battery,:tires)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($data);
+            $id = $pdo->lastInsertId();
+        }
+        if($warnings){
+            $_SESSION['warning'] = implode(' ', $warnings);
+        }
+        header('Location: index.php');
+        exit();
     } else {
-        // insert
-        $sql = "INSERT INTO car_jobs (movement_date, license, kilometers, employee, workplace, work_type, description, next_service_date, next_service_km, user_notes, battery, tires) VALUES (:movement_date,:license,:kilometers,:employee,:workplace,:work_type,:description,:next_service_date,:next_service_km,:user_notes,:battery,:tires)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($data);
-        $id = $pdo->lastInsertId();
+        $error = implode(' ', $errors);
+        $record = array_merge($record, $_POST);
     }
-    if($warnings){
-        $_SESSION['warning'] = implode(' ', $warnings);
-    }
-    header('Location: index.php');
-    exit();
 }
 
 // If editing, fetch existing data
@@ -111,15 +123,18 @@ if ($id) {
     <h1>Εργασίες Οχημάτων</h1>
     <nav>
         <a href="index.php" style="color:#fff;margin-right:10px;">Αρχική</a>
-        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώρηση</a>
+        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώριση</a>
         <a href="calendar.php" style="color:#fff;margin-right:10px;">Ημερολόγιο</a>
         <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
     </nav>
 </header>
 <h1><?= $id ? 'Επεξεργασία' : 'Νέα' ?> Εργασία Οχήματος</h1>
+<?php if(isset($error)): ?>
+<p style="color:red;text-align:center;"><?= htmlspecialchars($error) ?></p>
+<?php endif; ?>
 <form method="post">
-    <label>Ημερομηνία κίνησης: <input type="date" name="movement_date" value="<?= htmlspecialchars($record['movement_date']) ?>" required></label><br>
-    <label>Αριθμός πινακίδας:
+    <label>Ημερομηνία εγγραφής: <input type="date" name="movement_date" min="2025-01-02" value="<?= htmlspecialchars($record['movement_date']) ?>" required></label><br>
+    <label>Όχημα:
         <select name="license" required>
             <option value="">--Επιλογή--</option>
             <?php foreach ($licenses as $opt): ?>
@@ -127,7 +142,7 @@ if ($id) {
             <?php endforeach; ?>
         </select>
     </label><br>
-    <label>Χιλιόμετρα: <input type="number" name="kilometers" value="<?= htmlspecialchars($record['kilometers']) ?>" required></label><br>
+    <label>Χιλιόμετρα: <input type="number" name="kilometers" max="900000" value="<?= htmlspecialchars($record['kilometers']) ?>" required></label><br>
     <label>Υπάλληλος:
         <select name="employee" required>
             <option value="">--Επιλογή--</option>
@@ -155,18 +170,18 @@ if ($id) {
     <label>Περιγραφή:<br>
         <textarea name="description" rows="4" cols="50"><?= htmlspecialchars($record['description']) ?></textarea>
     </label><br>
-    <label>Ημερομηνία επόμενου Service: <input type="date" name="next_service_date" value="<?= htmlspecialchars($record['next_service_date']) ?>"></label><br>
-    <label>Χιλιόμετρα επόμενου Service: <input type="number" name="next_service_km" value="<?= htmlspecialchars($record['next_service_km']) ?>"></label><br>
+    <label>Ημ/νία Επόμ. Service: <input type="date" name="next_service_date" min="2025-01-02" value="<?= htmlspecialchars($record['next_service_date']) ?>"></label><br>
+    <label>ΧΛΜ Επόμ. Service: <input type="number" name="next_service_km" max="900000" value="<?= htmlspecialchars($record['next_service_km']) ?>"></label><br>
     <label>Σημειώσεις χρήστη:<br>
         <textarea name="user_notes" rows="2" cols="50"><?= htmlspecialchars($record['user_notes']) ?></textarea>
     </label><br>
-    <label>Αφορά μπαταρία:
+    <label>Αφορά Μπαταρία:
         <select name="battery">
             <option value="ΟΧΙ" <?= $record['battery']=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
             <option value="ΝΑΙ" <?= $record['battery']=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>
         </select>
     </label><br>
-    <label>Αφορά ελαστικά:
+    <label>Αφορά Ελαστικά:
         <select name="tires">
             <option value="ΟΧΙ" <?= $record['tires']=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
             <option value="ΝΑΙ" <?= $record['tires']=='ΝΑΙ'?'selected':'' ?>>ΝΑΙ</option>

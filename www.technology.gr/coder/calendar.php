@@ -36,6 +36,7 @@ header{padding:1em;background:#333;color:#fff;text-align:center;}
 footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
 table{border-collapse:collapse;width:100%;}
 th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;width:14.28%;}
+td strong{font-size:14px;}
 th{background:#f0f0f0;}
 @media(max-width:600px){th,td{height:auto;font-size:12px;}}
 nav a{margin-right:10px;}
@@ -46,7 +47,7 @@ nav a{margin-right:10px;}
     <h1>Εργασίες Οχημάτων</h1>
     <nav>
         <a href="index.php" style="color:#fff;margin-right:10px;">Αρχική</a>
-        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώρηση</a>
+        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώριση</a>
         <a href="calendar.php" style="color:#fff;margin-right:10px;">Ημερολόγιο</a>
         <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
     </nav>
@@ -54,8 +55,8 @@ nav a{margin-right:10px;}
 <main>
 <h2 style="text-align:center;"><?= mb_strtoupper($months_gr[$month], 'UTF-8').' '. $year ?></h2>
 <div style="text-align:center;margin-bottom:1em;">
-<a href="?month=<?=$prevMonth?>&year=<?=$prevYear?>">&laquo;</a>
-<a href="?month=<?=$nextMonth?>&year=<?=$nextYear?>">&raquo;</a>
+<a href="?month=<?=$prevMonth?>&year=<?=$prevYear?>" style="font-size:20px;margin-right:20px;">&#9664;</a>
+<a href="?month=<?=$nextMonth?>&year=<?=$nextYear?>" style="font-size:20px;margin-left:20px;">&#9654;</a>
 </div>
 <table>
 <tr><th>Δευ</th><th>Τρι</th><th>Τετ</th><th>Πεμ</th><th>Παρ</th><th>Σαβ</th><th>Κυρ</th></tr>
@@ -68,12 +69,16 @@ while($d<=$daysInMonth){
     echo '<td><a href="record.php?service_date='.$linkDate.'"><strong>'.$d.'</strong></a><br>';
     if(isset($records[$d])){
         foreach($records[$d] as $rec){
-            echo '<a href="record.php?id='.$rec['id'].'">'.htmlspecialchars($rec['license']).'</a><br>';
+            $lic = htmlspecialchars($rec['license']);
+            $disp = '<strong>'.mb_substr($lic,0,8,'UTF-8').'</strong>'.mb_substr($lic,8,null,'UTF-8');
+            echo '<a href="record.php?id='.$rec['id'].'">'.$disp.'</a><br>';
         }
     }
     if(isset($services[$d])){
         foreach($services[$d] as $rec){
-            echo '<span style="color:green;font-weight:bold;">'.htmlspecialchars($rec['license']).'</span><br>';
+            $lic = htmlspecialchars($rec['license']);
+            $disp = '<strong>'.mb_substr($lic,0,8,'UTF-8').'</strong>'.mb_substr($lic,8,null,'UTF-8');
+            echo '<span style="color:green;font-weight:bold;">'.$disp.'</span><br>';
         }
     }
     echo '</td>';

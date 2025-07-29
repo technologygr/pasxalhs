@@ -39,7 +39,7 @@ if($type === 'excel'){
     echo "\xEF\xBB\xBF"; // UTF-8 BOM
     echo "<html><head><meta charset=\"UTF-8\"><style>table{border-collapse:collapse;}td,th{border:1px solid #000;padding:4px;font-family:Arial,Helvetica,sans-serif;}</style></head><body>";
     echo "<table>";
-    echo "<tr><th>Ημερομηνία</th><th>Πινακίδα</th><th>Χιλιόμετρα</th><th>Υπάλληλος</th><th>Τόπος</th><th>Είδος</th><th>Περιγραφή</th><th>Επόμ. Serv Ημ.</th><th>Επόμ. Serv Χλμ</th><th>Σημειώσεις</th><th>Μπαταρία</th><th>Ελαστικά</th></tr>";
+    echo "<tr><th>Ημερομηνία εγγραφής</th><th>Οχημα</th><th>Χιλιόμετρα</th><th>Υπάλληλος</th><th>Τόπος</th><th>Είδος</th><th>Περιγραφή</th><th>Ημ/νία Επόμ. Service</th><th>ΧΛΜ Επόμ. Service</th><th>Σημειώσεις</th><th>Αφορά Μπαταρία</th><th>Αφορά Ελαστικά</th></tr>";
     foreach($records as $r){
         echo '<tr>';
         echo '<td>'.fmt_date($r['movement_date']).'</td>';
@@ -64,7 +64,7 @@ $width = 842; // landscape A4
 $height = 595;
 $margin = 20;
 $rowHeight = 20;
-$columns = ['Ημερομηνία','Πινακίδα','Χιλιόμετρα','Υπάλληλος','Τόπος','Είδος','Περιγραφή','Επόμ. Serv Ημ.','Επόμ. Serv Χλμ','Σημειώσεις','Μπαταρία','Ελαστικά'];
+$columns = ['Ημερομηνία εγγραφής','Οχημα','Χιλιόμετρα','Υπάλληλος','Τόπος','Είδος','Περιγραφή','Ημ/νία Επόμ. Service','ΧΛΜ Επόμ. Service','Σημειώσεις','Αφορά Μπαταρία','Αφορά Ελαστικά'];
 $colCount = count($columns);
 $usableWidth = $width - $margin*2;
 $colWidth = $usableWidth / $colCount;

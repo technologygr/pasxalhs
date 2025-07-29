@@ -59,8 +59,9 @@ function fmt_date($d){
 function display_text($text){
     $safe = nl2br(htmlspecialchars($text));
     if(mb_strlen($text)<=350) return $safe;
-    $short = nl2br(htmlspecialchars(mb_substr($text,0,350))).'...';
-    return '<span class="short-text" style="cursor:pointer;color:blue;">'.$short.'</span><span class="full-text" style="display:none;">'.$safe.'</span>';
+    $short = nl2br(htmlspecialchars(mb_substr($text,0,350)));
+    $icon  = '<span class="expand" style="cursor:pointer;color:blue;">&#x2795;</span>';
+    return $short.' '.$icon.'<span class="full-text" style="display:none;">'.$safe.'</span>';
 }
 
 // fetch dropdown lists for filters
@@ -127,31 +128,31 @@ $records = $stmt->fetchAll();
 <h1>Εργασίες Οχημάτων</h1>
 <nav>
     <a href="index.php" style="color:#fff;margin-right:10px;">Αρχική</a>
-    <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώρηση</a>
+    <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώριση</a>
     <a href="calendar.php" style="color:#fff;margin-right:10px;">Ημερολόγιο</a>
     <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
 </nav>
 </header>
 <div class="container">
 <?php if(isset($_SESSION['warning'])){echo '<p style="color:red">'.$_SESSION['warning'].'</p>';unset($_SESSION['warning']);} ?>
-<p><a href="record.php">Νέα Καταχώρηση</a></p>
+<p><a href="record.php">Νέα Καταχώριση</a></p>
 <div style="overflow-x:auto;">
 <form method="get">
 <table>
 <thead>
 <tr>
-    <th>Ημερομηνία<br>🔍</th>
-    <th>Πινακίδα<br>🔍</th>
+    <th>Ημερομηνία εγγραφής<br>🔍</th>
+    <th>Οχημα<br>🔍</th>
     <th>Χιλιόμετρα</th>
     <th>Υπάλληλος</th>
     <th>Τόπος<br>🔍</th>
     <th>Είδος<br>🔍</th>
     <th>Περιγραφή</th>
-    <th>Επόμ. Serv Ημ.</th>
-    <th>Επόμ. Serv Χλμ</th>
+    <th>Ημ/νία Επόμ. Service</th>
+    <th>ΧΛΜ Επόμ. Service</th>
     <th>Σημειώσεις</th>
-    <th>Μπαταρία<br>🔍</th>
-    <th>Ελαστικά<br>🔍</th>
+    <th>Αφορά Μπαταρία<br>🔍</th>
+    <th>Αφορά Ελαστικά<br>🔍</th>
     <th>Ενέργειες</th>
 </tr>
 <tr class="filters">
@@ -200,7 +201,7 @@ $records = $stmt->fetchAll();
             <option value="ΟΧΙ" <?= $filter_tires=='ΟΧΙ'?'selected':'' ?>>ΟΧΙ</option>
         </select>
     </td>
-    <td><button type="submit">OK</button> <a href="index.php">Reset</a></td>
+    <td><button type="submit" style="background:green;color:#fff;">OK</button> <a href="index.php" title="RESET ΦΙΛΤΡΩΝ" style="text-decoration:none;">&#x21bb;</a></td>
 </tr>
 </thead>
 <tbody>
@@ -210,8 +211,8 @@ $records = $stmt->fetchAll();
     $licenseDisp = '<strong>'.mb_substr($license,0,8,'UTF-8').'</strong>'.mb_substr($license,8,null,'UTF-8');
 ?>
 <tr>
-    <td data-label="Ημερομηνία"><?= fmt_date($row['movement_date']) ?></td>
-    <td data-label="Πινακίδα"><?= $licenseDisp ?></td>
+    <td data-label="Ημερομηνία εγγραφής"><?= fmt_date($row['movement_date']) ?></td>
+    <td data-label="Οχημα"><?= $licenseDisp ?></td>
     <td data-label="Χιλιόμετρα" style="text-align:center;">
         <?= number_format($row['kilometers'],0,',','.') ?>
     </td>
@@ -219,11 +220,11 @@ $records = $stmt->fetchAll();
     <td data-label="Τόπος"><?= htmlspecialchars($row['workplace']) ?></td>
     <td data-label="Είδος"><?= htmlspecialchars($row['work_type']) ?></td>
     <td data-label="Περιγραφή"><?= display_text($row['description']) ?></td>
-    <td data-label="Επόμ. Serv Ημ."><?= $row['next_service_date']?fmt_date($row['next_service_date']):'' ?></td>
-    <td data-label="Επόμ. Serv Χλμ" style="text-align:center;"><?= $row['next_service_km']?number_format($row['next_service_km'],0,',','.'):'' ?></td>
+    <td data-label="Ημ/νία Επόμ. Service"><?= $row['next_service_date']?fmt_date($row['next_service_date']):'' ?></td>
+    <td data-label="ΧΛΜ Επόμ. Service" style="text-align:center;"><?= $row['next_service_km']?number_format($row['next_service_km'],0,',','.'):'' ?></td>
     <td data-label="Σημειώσεις"><?= display_text($row['user_notes']) ?></td>
-    <td data-label="Μπαταρία" style="text-align:center;"><?= htmlspecialchars($row['battery']) ?></td>
-    <td data-label="Ελαστικά" style="text-align:center;"><?= htmlspecialchars($row['tires']) ?></td>
+    <td data-label="Αφορά Μπαταρία" style="text-align:center;"><?= htmlspecialchars($row['battery']) ?></td>
+    <td data-label="Αφορά Ελαστικά" style="text-align:center;"><?= htmlspecialchars($row['tires']) ?></td>
     <td>
         <a href="record.php?id=<?= $row['id'] ?>" title="Επεξεργασία" style="text-decoration:none;">✏️</a>
         |
@@ -253,7 +254,7 @@ if($page*$perPage < $totalRecords){
 <footer>ver 1.0  (c) 2025</footer>
 <script>
 document.addEventListener('click',function(e){
-  if(e.target.classList.contains('short-text')){
+  if(e.target.classList.contains('expand')){
      e.target.style.display='none';
      var full=e.target.nextElementSibling; if(full) full.style.display='inline';
   }

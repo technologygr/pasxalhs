@@ -73,7 +73,7 @@ $items = $pdo->query("SELECT * FROM $table ORDER BY name")->fetchAll();
     <h1>Εργασίες Οχημάτων</h1>
     <nav>
         <a href="index.php" style="color:#fff;margin-right:10px;">Αρχική</a>
-        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώρηση</a>
+        <a href="record.php" style="color:#fff;margin-right:10px;">Νέα Καταχώριση</a>
         <a href="calendar.php" style="color:#fff;margin-right:10px;">Ημερολόγιο</a>
         <a href="helpers.php" style="color:#fff;">Βοηθητικά</a>
     </nav>
