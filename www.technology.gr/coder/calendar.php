@@ -36,9 +36,10 @@ main{flex:1;}
 header{padding:1em;background:#333;color:#fff;text-align:center;}
 footer{padding:.3em;background:#333;color:#fff;font-size:12px;text-align:left;}
 table{border-collapse:collapse;width:100%;}
-th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;width:14.28%;}
-td strong{font-size:28px;color:#000;}
 .entries{font-size:12px;line-height:1.2;}
+th,td{border:1px solid #ccc;padding:5px;height:80px;vertical-align:top;width:14.28%;}
+td > strong{font-size:28px;color:#000;}
+.entries strong{font-size:inherit;}
 td a{color:#000;text-decoration:none;}
 th{background:#f0f0f0;}
 @media(max-width:600px){th,td{height:auto;font-size:12px;}}
